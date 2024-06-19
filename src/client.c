@@ -183,7 +183,7 @@ int main(int argc, char const *argv[])
   // - create n threads where n is the numerical value of argv[1]
   // - have all threads join before exiting
 
-  num_threads = argv[1];
+  num_threads = atoi(argv[1]);
   pthread_t *tids = malloc(sizeof(pthread_t) * num_threads);
   for (i = 0; i < num_threads; i++) {
     pthread_create(&tids[i], NULL, thread_task, NULL);
