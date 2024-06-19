@@ -398,6 +398,8 @@ void* serve_client(void *newsock)
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
 
+  //pthread_cond_lock()
+
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
@@ -418,12 +420,7 @@ void* serve_client(void *newsock)
   // If any, free unused variables
   // TODO
 
-  /*
-  for (i=0; i<burger_count; i++) {
-    free(order_list[i]);
-  }
   free(order_list);
-  */
 
   close(clientfd);
   free(newsock);
@@ -496,6 +493,8 @@ void start_server()
       pthread_join(serve_client_tid, NULL);
     }
   }
+
+  while (1);
 }
 
 /// @brief prints overall statistics
