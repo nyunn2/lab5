@@ -420,7 +420,7 @@ void* serve_client(void *newsock)
   // If any, free unused variables
   // TODO
 
-  free(order_list);
+  //free(order_list);
 
   close(clientfd);
   free(newsock);
