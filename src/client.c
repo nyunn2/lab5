@@ -186,11 +186,11 @@ int main(int argc, char const *argv[])
   num_threads = argv[1];
   pthread_t *tids = malloc(sizeof(pthread_t) * num_threads);
   for (i = 0; i < num_threads; i++) {
-    pthread_create(&tid[i], NULL, thread_task, NULL);
+    pthread_create(&tids[i], NULL, thread_task, NULL);
   }
 
   for (i = 0; i < num_threads; i++) {
-    pthread_join(tid[i], NULL);
+    pthread_join(tids[i], NULL);
   }
 
   return 0;
