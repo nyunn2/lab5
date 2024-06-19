@@ -97,7 +97,6 @@ void *thread_task(void *data)
     }
     ai_it = ai_it->ai_next;
   }
-  freeaddrinfo(ai);
 
   // Read welcome message from the server
   read = get_line(serverfd, &buffer, &buflen);
@@ -194,7 +193,7 @@ int main(int argc, char const *argv[])
     pthread_join(tids[i], NULL);
   }
 
-  free(tids);
+  //free(tids);
 
   return 0;
 }
