@@ -84,19 +84,20 @@ void *thread_task(void *data)
   // Iterate over addrinfos and try to connect
   // TODO
   int *res = NULL;
-  int fd;
 
   ai = getsocklist(IP, PORT, AF_UNSPEC, SOCK_STREAM, 0, res);
   ai_it = ai;
+
   while (ai_it != NULL) {
     dump_sockaddr(ai_it->ai_addr);
-    fd = socket(ai_it->ai_family, ai_it->ai_socktype, ai_it->ai_protocol);
-    if (fd != -1) {
-      if (connect(fd, ai_it->ai_addr, ai_it->ai_addrlen) != -1) break;
-      close(fd);
+    serverfd = socket(ai_it->ai_family, ai_it->ai_socktype, ai_it->ai_protocol);
+    if (serverfd != -1) {
+      if (connect(serverfd, ai_it->ai_addr, ai_it->ai_addrlen) != -1) break;
+      close(serverfd);
     }
     ai_it = ai_it->ai_next;
   }
+  freeaddrinfo(ai);
 
   // Read welcome message from the server
   read = get_line(serverfd, &buffer, &buflen);
@@ -192,6 +193,8 @@ int main(int argc, char const *argv[])
   for (i = 0; i < num_threads; i++) {
     pthread_join(tids[i], NULL);
   }
+
+  free(tids);
 
   return 0;
 }

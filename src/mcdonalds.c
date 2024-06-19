@@ -267,9 +267,9 @@ void* kitchen_task(void *dummy)
     // TODO
 
     make_burger(order);
-    pthread_mutex_lock(order->cond_mutex);
+    //pthread_mutex_lock(order->cond_mutex);
     *(order->remain_count)--;
-    pthread_mutex_unlock(order->cond_mutex);
+    //pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
@@ -381,6 +381,10 @@ void* serve_client(void *newsock)
     else if (strcmp(token, "CHEESE") == 0) type = BURGER_CHEESE;
     else if (strcmp(token, "CHICKEN") == 0) type = BURGER_CHICKEN;
     else if (strcmp(token, "BULGOGI") == 0) type = BURGER_BULGOGI;
+    else if ((strcmp(token, "Can") == 0) || (strcmp(token, "I") == 0) 
+    || (strcmp(token, "have") == 0) || (strcmp(token, "burger(s)?") == 0)) {
+      continue;
+    }
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
@@ -394,11 +398,9 @@ void* serve_client(void *newsock)
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
 
-  pthread_mutex_lock(first_order->cond_mutex);
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
-  pthread_mutex_unlock(first_order->cond_mutex);
 
   if (*(first_order->remain_count) == 0) {
     ret = asprintf(&message, "Your order(%s) is ready! Goodbye!\n", *(first_order->order_str));
@@ -412,17 +414,18 @@ void* serve_client(void *newsock)
     free(message);
   }
   
-
   pthread_cond_destroy(first_order->cond);
   pthread_mutex_destroy(first_order->cond_mutex);
 
   // If any, free unused variables
   // TODO
 
+  /*
   for (i=0; i<burger_count; i++) {
     free(order_list[i]);
   }
   free(order_list);
+  */
 
   close(clientfd);
   free(newsock);
@@ -438,8 +441,8 @@ void* serve_client(void *newsock)
 /// @brief start server listening
 void start_server()
 {
-  //int clientfd, addrlen, opt = 1, *newsock;
-  //struct sockaddr_in client;
+  int clientfd, addrlen, opt = 1, *newsock;
+  struct sockaddr_in client;
   struct addrinfo *ai, *ai_it;
 
   // Get socket list by using getsocklist()
@@ -467,54 +470,32 @@ void start_server()
     ai_it = ai_it->ai_next;
   }
 
+  freeaddrinfo(ai);
+
   // Keep listening and accepting clients
   // Check if max number of customers is not exceeded after accepting
   // Create a serve_client thread for the client
   // TODO
 
-  fprintf(stderr, "kitchen before\n");
-
-  // Create kitchen threads
-  for (int i = 0; i < NUM_KITCHEN; i++) {
-    pthread_create(&kitchen_thread[i], NULL, kitchen_task, NULL);
-  }
-
-  fprintf(stderr, "kitchen good\n");
-  
   while (keep_running) {
-    int *serve_client_fd = malloc(sizeof(int));
-    struct sockaddr client;
-    socklen_t clientlen = sizeof(client);
 
-    //fprintf(stderr, "while good\n");
+    clientfd = accept(listenfd, (struct sockaddr *)&client, (socklen_t *)&addrlen);
 
-    *serve_client_fd = accept(listenfd, &client, &clientlen);
-
-    if (*serve_client_fd > 0) {
-      //fprintf(stderr, "accept good\n");
+    if (clientfd > 0) {
       pthread_mutex_lock(&server_ctx.lock);
       if (server_ctx.total_queueing >= CUSTOMER_MAX) {
-        //fprintf(stderr, "maximum\n");
         pthread_mutex_unlock(&server_ctx.lock);
-        close(*serve_client_fd);
-        free(serve_client_fd);
+        close(clientfd);
         printf("Maximum number of customers reached. Connection refused.\n");
         continue;
       }
 
-      //fprintf(stderr, "maximum no\n");
       server_ctx.total_queueing++;
       pthread_mutex_unlock(&server_ctx.lock);
 
-      dump_sockaddr(&client);
-
-      pthread_t tid;
-      if (pthread_create(&tid, NULL, serve_client, serve_client_fd) != 0) {
-        close(*serve_client_fd);
-        free(serve_client_fd);
-        continue;
-      }
-      //fprintf(stderr, "create good\n");
+      pthread_t serve_client_tid;
+      pthread_create(&serve_client_tid, NULL, serve_client, (void*)clientfd);
+      pthread_join(serve_client_tid);
     }
   }
 }
