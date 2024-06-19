@@ -495,7 +495,7 @@ void start_server()
 
       pthread_t serve_client_tid;
       pthread_create(&serve_client_tid, NULL, serve_client, (void*)clientfd);
-      pthread_join(serve_client_tid);
+      pthread_join(serve_client_tid, NULL);
     }
   }
 }
