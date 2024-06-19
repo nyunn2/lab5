@@ -477,16 +477,20 @@ void start_server()
     pthread_create(&kitchen_thread[i], NULL, kitchen_task, NULL);
   }
   
-  while (1) {
+  while (keep_running) {
     int *serve_client_fd = malloc(sizeof(int));
     struct sockaddr client;
     socklen_t clientlen = sizeof(client);
 
+    fprintf(stderr, "while good\n");
+
     *serve_client_fd = accept(listenfd, &client, &clientlen);
 
     if (*serve_client_fd > 0) {
+      fprintf(stderr, "accept good\n");
       pthread_mutex_lock(&server_ctx.lock);
       if (server_ctx.total_queueing >= CUSTOMER_MAX) {
+        fprintf(stderr, "maximum\n");
         pthread_mutex_unlock(&server_ctx.lock);
         close(*serve_client_fd);
         free(serve_client_fd);
@@ -494,6 +498,7 @@ void start_server()
         continue;
       }
 
+      fprintf(stderr, "maximum no\n");
       server_ctx.total_queueing++;
       pthread_mutex_unlock(&server_ctx.lock);
 
@@ -505,6 +510,7 @@ void start_server()
         free(serve_client_fd);
         continue;
       }
+      fprintf(stderr, "create good\n");
     }
   }
 }
