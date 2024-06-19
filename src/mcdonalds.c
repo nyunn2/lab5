@@ -391,7 +391,7 @@ void* serve_client(void *newsock)
     types[burger_count++] = type;
   }
 
-  Node **order_list = issue_orders(customerID, types, burger_count);
+  order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
 
   pthread_mutex_lock(first_order->cond_mutex);
@@ -419,7 +419,7 @@ void* serve_client(void *newsock)
   // If any, free unused variables
   // TODO
 
-  for (int i=0; i<burger_count; i++) {
+  for (i=0; i<burger_count; i++) {
     free(order_list[i]);
   }
   free(order_list);
