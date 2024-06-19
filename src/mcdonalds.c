@@ -267,9 +267,9 @@ void* kitchen_task(void *dummy)
     // TODO
 
     make_burger(order);
-    //pthread_mutex_lock(order->cond_mutex);
+    pthread_mutex_lock(order->cond_mutex);
     *(order->remain_count)--;
-    //pthread_mutex_unlock(order->cond_mutex);
+    pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
@@ -398,8 +398,6 @@ void* serve_client(void *newsock)
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
 
-  //pthread_cond_lock()
-
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
@@ -442,9 +440,9 @@ void start_server()
 
   // Get socket list by using getsocklist()
   // TODO
-  int *res = NULL;
+  int res;
 
-  ai = getsocklist(IP, PORT, AF_UNSPEC, SOCK_STREAM, 1, res);
+  ai = getsocklist(NULL, PORT, AF_UNSPEC, SOCK_STREAM, 1, &res);
 
   // Iterate over addrinfos and try to bind & listen
   // TODO
@@ -473,7 +471,6 @@ void start_server()
   // TODO
 
   while (keep_running) {
-
     clientfd = accept(listenfd, (struct sockaddr *)&client, (socklen_t *)&addrlen);
 
     if (clientfd > 0) {
