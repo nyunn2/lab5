@@ -410,8 +410,6 @@ void* serve_client(void *newsock)
       error_client(clientfd, newsock, buffer);
       return NULL;
     }
-    free(*(first_order->order_str));
-    free(message);
   }
   
   pthread_cond_destroy(first_order->cond);
