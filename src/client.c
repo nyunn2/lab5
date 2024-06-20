@@ -101,6 +101,8 @@ void *thread_task(void *data)
     ai_it = ai_it->ai_next;
   }
 
+  fprintf(stderr, "client, before reading\n");
+
   // Read welcome message from the server
   read = get_line(serverfd, &buffer, &buflen);
   if (read <= 0) {
@@ -187,7 +189,7 @@ int main(int argc, char const *argv[])
   // - have all threads join before exiting
 
   num_threads = atoi(argv[1]);
-  pthread_t *tids = malloc(sizeof(pthread_t) * num_threads);
+  pthread_t tids[num_threads];
   for (i = 0; i < num_threads; i++) {
     pthread_create(&tids[i], NULL, thread_task, NULL);
   }
@@ -195,8 +197,6 @@ int main(int argc, char const *argv[])
   for (i = 0; i < num_threads; i++) {
     pthread_join(tids[i], NULL);
   }
-
-  free(tids);
 
   return 0;
 }

@@ -377,10 +377,10 @@ void* serve_client(void *newsock)
     if (burger_count >= MAX_BURGERS) break;
     enum burger_type type = BURGER_TYPE_MAX;
 
-    if (strcmp(token, "BIGMAC") == 0) type = BURGER_BIGMAC;
-    else if (strcmp(token, "CHEESE") == 0) type = BURGER_CHEESE;
-    else if (strcmp(token, "CHICKEN") == 0) type = BURGER_CHICKEN;
-    else if (strcmp(token, "BULGOGI") == 0) type = BURGER_BULGOGI;
+    if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
+    else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
+    else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
+    else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
     else if ((strcmp(token, "Can") == 0) || (strcmp(token, "I") == 0) 
     || (strcmp(token, "have") == 0) || (strcmp(token, "burger(s)?") == 0)) {
       continue;
@@ -395,10 +395,10 @@ void* serve_client(void *newsock)
     types[burger_count++] = type;
   }
 
-  //pthread_mutex_lock(&kit);
+  pthread_mutex_lock(&server_ctx.lock);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
-  //pthread_mutex_unlock(&lock);
+  pthread_mutex_unlock(&server_ctx.lock);
 
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
@@ -442,9 +442,8 @@ void start_server()
 
   // Get socket list by using getsocklist()
   // TODO
-  int res;
 
-  ai = getsocklist(NULL, PORT, AF_INET, SOCK_STREAM, 1, &res);
+  ai = getsocklist(NULL, PORT, AF_INET, SOCK_STREAM, 1, NULL);
 
   // Iterate over addrinfos and try to bind & listen
   // TODO
@@ -488,7 +487,9 @@ void start_server()
       pthread_mutex_unlock(&server_ctx.lock);
 
       pthread_t serve_client_tid;
-      pthread_create(&serve_client_tid, NULL, serve_client, (void*)clientfd);
+      int *thread_client_fd = (int*) malloc(sizeof(int));
+      *thread_client_fd = clientfd;
+      pthread_create(&serve_client_tid, NULL, serve_client, (void*)thread_client_fd);
       pthread_detach(serve_client_tid);
     }
   }
