@@ -261,6 +261,8 @@ void* kitchen_task(void *dummy)
     customerID = order->customerID;
     printf("[Thread %lu] generating %s burger for customer %u\n", tid, burger_names[type], customerID);
 
+    fprintf(stderr, "kitchen good\n");
+
     // Make burger and reduce `remain_count` of request
     // - Use make_burger()
     // - Reduce `remain_count` by one
@@ -366,6 +368,7 @@ void* serve_client(void *newsock)
 
   char *token;
   char *rest = buffer;
+  // remove '\0'from buffer
   char *end = rest + strlen(rest) - 1;
   while (end > rest && isspace((unsigned char)*end)) {
     *end = '\0';
@@ -379,14 +382,10 @@ void* serve_client(void *newsock)
     enum burger_type type = BURGER_TYPE_MAX;
 
     printf("%s\n", token);
-    if (strcmp(token, "bigmac") == 0) {type = BURGER_BIGMAC;
-    printf("big good\n");}
-    else if (strcmp(token, "cheese") == 0) {type = BURGER_CHEESE;
-    printf("cheese good\n");}
-    else if (strcmp(token, "chicken") == 0) {type = BURGER_CHICKEN;
-    printf("chic good\n");}
-    else if (strcmp(token, "bulgogi") == 0) {type = BURGER_BULGOGI;
-    printf("bulgogi good\n");}
+    if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
+    else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
+    else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
+    else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
@@ -407,14 +406,17 @@ void* serve_client(void *newsock)
   // If request is successfully handled, hand ordered burgers and say goodbye
   // All orders share the same `remain_count`, so access it through the first orders  
 
-  pthread_mutex_lock(&server_ctx.lock);
+  //pthread_mutex_lock(&server_ctx.lock);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
-  pthread_mutex_unlock(&server_ctx.lock);
+  fprintf(stderr, "issue good\n");
+  //pthread_mutex_unlock(&server_ctx.lock);
 
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
+
+  fprintf(stedrr, "wait good\n");
 
   if (*(first_order->remain_count) == 0) {
     ret = asprintf(&message, "Your order(%s) is ready! Goodbye!\n", *(first_order->order_str));
@@ -499,11 +501,9 @@ void start_server()
       server_ctx.total_queueing++;
       pthread_mutex_unlock(&server_ctx.lock);
 
-      fprintf(stderr, "client1\n");
       pthread_t serve_client_tid;
       int *thread_client_fd = (int*) malloc(sizeof(int));
       *thread_client_fd = clientfd;
-      fprintf(stderr, "client2\n");
       pthread_create(&serve_client_tid, NULL, serve_client, (void*)thread_client_fd);
       pthread_detach(serve_client_tid);
     }
