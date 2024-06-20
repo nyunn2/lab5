@@ -379,7 +379,9 @@ void* serve_client(void *newsock)
     end--;
   }
 
-  types = malloc(sizeof(enum burger_type) * MAX_BURGERS);
+  printf("rest: %s", rest);
+
+  types = (enum burger_type*)malloc(sizeof(enum burger_type) * MAX_BURGERS);
 
   while ((token = strtok_r(rest, " ", &rest))) {
     if (burger_count >= MAX_BURGERS) break;
@@ -399,8 +401,6 @@ void* serve_client(void *newsock)
     burger_count += 1;
     types[burger_count] = type;
   }
-
-  printf("types: %s", types);
 
   // Issue orders to kitchen and wait
   // - Tip: use pthread_cond_wait() to wait
