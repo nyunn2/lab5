@@ -370,6 +370,8 @@ void* serve_client(void *newsock)
   // - Tip: try using strtok_r() with while statement
   // TODO
 
+  pthread_mutex_lock(&server_ctx.lock);
+
   char *token;
   char *rest = buffer;
   // remove '\0'from buffer
@@ -379,7 +381,7 @@ void* serve_client(void *newsock)
     end--;
   }
 
-  printf("rest: %s", rest);
+  printf("rest: %s\n", rest);
 
   types = (enum burger_type*)malloc(sizeof(enum burger_type) * MAX_BURGERS);
 
@@ -401,6 +403,8 @@ void* serve_client(void *newsock)
     burger_count += 1;
     types[burger_count] = type;
   }
+
+  pthread_mutex_unlock(&server_ctx.lock);
 
   // Issue orders to kitchen and wait
   // - Tip: use pthread_cond_wait() to wait
