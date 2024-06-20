@@ -271,10 +271,8 @@ void* kitchen_task(void *dummy)
     // TODO
 
     pthread_mutex_lock(order->cond_mutex);
-    //printf("before: customer %d remain count is %d\n", customerID, *(order->remain_count));
     make_burger(order);
     *(order->remain_count) -= 1;
-    //pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
@@ -364,6 +362,8 @@ void* serve_client(void *newsock)
       return NULL;
   }
 
+  printf("receive: %s\n", buffer);
+
   // Parse and split request from the customer into orders
   // - Fill in `types` variable with each parsed burger type and increase `burger_count`
   // - While parsing, if burger is not an available type, exit connection
@@ -400,6 +400,8 @@ void* serve_client(void *newsock)
     types[burger_count] = type;
   }
 
+  printf("types: %s", types);
+
   // Issue orders to kitchen and wait
   // - Tip: use pthread_cond_wait() to wait
   // - Tip2: use issue_orders() to issue request
@@ -410,11 +412,8 @@ void* serve_client(void *newsock)
   // If request is successfully handled, hand ordered burgers and say goodbye
   // All orders share the same `remain_count`, so access it through the first orders  
 
-  //pthread_mutex_lock(&server_ctx.lock);
-  //printf("customer %d burgercount: %d\n", customerID, burger_count);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
-  //pthread_mutex_unlock(&server_ctx.lock);
 
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
