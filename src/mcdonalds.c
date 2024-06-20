@@ -350,30 +350,21 @@ void* serve_client(void *newsock)
   // Receive request from the customer
   // TODO
 
-  // Parse and split request from the customer into orders
-  // - Fill in `types` variable with each parsed burger type and increase `burger_count`
-  // - While parsing, if burger is not an available type, exit connection
-  // - Tip: try using strtok_r() with while statement
-  // TODO
-
-  // Issue orders to kitchen and wait
-  // - Tip: use pthread_cond_wait() to wait
-  // - Tip2: use issue_orders() to issue request
-  // - Tip3: all orders in a request share the same `cond` and `cond_mutex`,
-  //         so access such variables through the first order
-  // TODO
-
-  // If request is successfully handled, hand ordered burgers and say goodbye
-  // All orders share the same `remain_count`, so access it through the first orders
-
   ret = get_line(clientfd, &buffer, &msglen);
   if (ret <= 0) {
       error_client(clientfd, newsock, buffer);
       return NULL;
   }
 
+  // Parse and split request from the customer into orders
+  // - Fill in `types` variable with each parsed burger type and increase `burger_count`
+  // - While parsing, if burger is not an available type, exit connection
+  // - Tip: try using strtok_r() with while statement
+  // TODO
+
   char *token;
   char *rest = buffer;
+  types = malloc(sizeof(enum burger_type) * MAX_BURGERS);
 
   while ((token = strtok_r(rest, " ", &rest))) {
     if (burger_count >= MAX_BURGERS) break;
@@ -383,12 +374,6 @@ void* serve_client(void *newsock)
     else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
     else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
     else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
-    /*
-    else if ((strcmp(token, "Can") == 0) || (strcmp(token, "I") == 0) 
-    || (strcmp(token, "have") == 0) || (strcmp(token, "burger(s)?") == 0)) {
-      continue;
-    }
-    */
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
@@ -398,6 +383,16 @@ void* serve_client(void *newsock)
 
     types[burger_count++] = type;
   }
+
+  // Issue orders to kitchen and wait
+  // - Tip: use pthread_cond_wait() to wait
+  // - Tip2: use issue_orders() to issue request
+  // - Tip3: all orders in a request share the same `cond` and `cond_mutex`,
+  //         so access such variables through the first order
+  // TODO
+
+  // If request is successfully handled, hand ordered burgers and say goodbye
+  // All orders share the same `remain_count`, so access it through the first orders  
 
   pthread_mutex_lock(&server_ctx.lock);
   order_list = issue_orders(customerID, types, burger_count);
@@ -490,7 +485,7 @@ void start_server()
       pthread_mutex_lock(&server_ctx.lock);
       server_ctx.total_queueing++;
       pthread_mutex_unlock(&server_ctx.lock);
-      
+
       fprintf(stderr, "client1\n");
       pthread_t serve_client_tid;
       int *thread_client_fd = (int*) malloc(sizeof(int));
