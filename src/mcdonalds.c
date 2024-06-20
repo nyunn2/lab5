@@ -322,6 +322,8 @@ void* serve_client(void *newsock)
   buffer = (char *) malloc(BUF_SIZE);
   msglen = BUF_SIZE;
 
+  fprintf(stderr, "client3\n");
+
   // Get customer ID
   pthread_mutex_lock(&server_ctx.lock);
   customerID = server_ctx.total_customers++;
@@ -381,10 +383,12 @@ void* serve_client(void *newsock)
     else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
     else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
     else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
+    /*
     else if ((strcmp(token, "Can") == 0) || (strcmp(token, "I") == 0) 
     || (strcmp(token, "have") == 0) || (strcmp(token, "burger(s)?") == 0)) {
       continue;
     }
+    */
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
@@ -475,20 +479,23 @@ void start_server()
     clientfd = accept(listenfd, (struct sockaddr *)&client, (socklen_t *)&addrlen);
 
     if (clientfd > 0) {
-      pthread_mutex_lock(&server_ctx.lock);
+      //pthread_mutex_lock(&server_ctx.lock);
       if (server_ctx.total_queueing >= CUSTOMER_MAX) {
-        pthread_mutex_unlock(&server_ctx.lock);
+        //pthread_mutex_unlock(&server_ctx.lock);
         close(clientfd);
         printf("Maximum number of customers reached. Connection refused.\n");
         continue;
       }
 
+      pthread_mutex_lock(&server_ctx.lock);
       server_ctx.total_queueing++;
       pthread_mutex_unlock(&server_ctx.lock);
-
+      
+      fprintf(stderr, "client1\n");
       pthread_t serve_client_tid;
       int *thread_client_fd = (int*) malloc(sizeof(int));
       *thread_client_fd = clientfd;
+      fprintf(stderr, "client2\n");
       pthread_create(&serve_client_tid, NULL, serve_client, (void*)thread_client_fd);
       pthread_detach(serve_client_tid);
     }
