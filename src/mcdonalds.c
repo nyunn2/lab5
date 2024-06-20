@@ -273,7 +273,7 @@ void* kitchen_task(void *dummy)
     pthread_mutex_lock(order->cond_mutex);
     make_burger(order);
     *(order->remain_count) -= 1;
-    pthread_mutex_unlock(&order->cond_mutex);
+    pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
