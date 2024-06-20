@@ -366,6 +366,12 @@ void* serve_client(void *newsock)
 
   char *token;
   char *rest = buffer;
+  char *end = rest + strlen(rest) - 1;
+  while (end > rest && isspace((unsinged char)*end)) {
+    *end = '\0';
+    end--;
+  }
+
   types = malloc(sizeof(enum burger_type) * MAX_BURGERS);
 
   while ((token = strtok_r(rest, " ", &rest))) {
@@ -373,12 +379,14 @@ void* serve_client(void *newsock)
     enum burger_type type = BURGER_TYPE_MAX;
 
     printf("%s\n", token);
-    if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
-
+    if (strcmp(token, "bigmac") == 0) {type = BURGER_BIGMAC;
+    printf("big good\n");}
     else if (strcmp(token, "cheese") == 0) {type = BURGER_CHEESE;
     printf("cheese good\n");}
-    else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
-    else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
+    else if (strcmp(token, "chicken") == 0) {type = BURGER_CHICKEN;
+    printf("chic good\n");}
+    else if (strcmp(token, "bulgogi") == 0) {type = BURGER_BULGOGI;
+    printf("bulgogi good\n");}
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
