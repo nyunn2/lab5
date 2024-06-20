@@ -356,6 +356,8 @@ void* serve_client(void *newsock)
       return NULL;
   }
 
+  printf("%s\n", buffer);
+
   // Parse and split request from the customer into orders
   // - Fill in `types` variable with each parsed burger type and increase `burger_count`
   // - While parsing, if burger is not an available type, exit connection
@@ -370,6 +372,7 @@ void* serve_client(void *newsock)
     if (burger_count >= MAX_BURGERS) break;
     enum burger_type type = BURGER_TYPE_MAX;
 
+    printf("%s\n", token);
     if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
     else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
     else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;

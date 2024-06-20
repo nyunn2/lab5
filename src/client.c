@@ -101,8 +101,6 @@ void *thread_task(void *data)
     ai_it = ai_it->ai_next;
   }
 
-  fprintf(stderr, "client, before reading\n");
-
   // Read welcome message from the server
   read = get_line(serverfd, &buffer, &buflen);
   if (read <= 0) {
