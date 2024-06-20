@@ -409,6 +409,7 @@ void* serve_client(void *newsock)
   // All orders share the same `remain_count`, so access it through the first orders  
 
   //pthread_mutex_lock(&server_ctx.lock);
+  printf("customer %d burgercount: %d\n", customerID, burger_count);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
   //pthread_mutex_unlock(&server_ctx.lock);
