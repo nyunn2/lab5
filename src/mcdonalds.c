@@ -416,7 +416,7 @@ void* serve_client(void *newsock)
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
 
-  fprintf(stedrr, "wait good\n");
+  fprintf(stderr, "wait good\n");
 
   if (*(first_order->remain_count) == 0) {
     ret = asprintf(&message, "Your order(%s) is ready! Goodbye!\n", *(first_order->order_str));
