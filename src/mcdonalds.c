@@ -374,7 +374,9 @@ void* serve_client(void *newsock)
 
     printf("%s\n", token);
     if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
-    else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
+
+    else if (strcmp(token, "cheese") == 0) {type = BURGER_CHEESE;
+    printf("cheese good\n");}
     else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
     else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
 
