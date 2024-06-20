@@ -395,8 +395,10 @@ void* serve_client(void *newsock)
     types[burger_count++] = type;
   }
 
+  //pthread_mutex_lock(&kit);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
+  //pthread_mutex_unlock(&lock);
 
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
@@ -442,7 +444,7 @@ void start_server()
   // TODO
   int res;
 
-  ai = getsocklist(NULL, PORT, AF_UNSPEC, SOCK_STREAM, 1, &res);
+  ai = getsocklist(NULL, PORT, AF_INET, SOCK_STREAM, 1, &res);
 
   // Iterate over addrinfos and try to bind & listen
   // TODO
@@ -451,7 +453,7 @@ void start_server()
 
   ai_it = ai;
   while (ai_it != NULL) {
-    dump_sockaddr(ai_it->ai_addr);
+    //dump_sockaddr(ai_it->ai_addr);
     listenfd = socket(ai_it->ai_family, ai_it->ai_socktype, ai_it->ai_protocol);
 
     if(listenfd != -1) {
@@ -463,7 +465,7 @@ void start_server()
     ai_it = ai_it->ai_next;
   }
 
-  freeaddrinfo(ai);
+  //freeaddrinfo(ai);
 
   // Keep listening and accepting clients
   // Check if max number of customers is not exceeded after accepting
@@ -487,11 +489,9 @@ void start_server()
 
       pthread_t serve_client_tid;
       pthread_create(&serve_client_tid, NULL, serve_client, (void*)clientfd);
-      pthread_join(serve_client_tid, NULL);
+      pthread_detach(serve_client_tid);
     }
   }
-
-  while (1);
 }
 
 /// @brief prints overall statistics

@@ -85,14 +85,14 @@ void *thread_task(void *data)
   // TODO
   int res;
 
-  ai = getsocklist(IP, PORT, AF_UNSPEC, SOCK_STREAM, 0, &res);
+  ai = getsocklist(IP, PORT, AF_INET, SOCK_STREAM, 0, &res);
 
   if (res != 0) fprintf(stderr, "client socket failed\n");
 
   ai_it = ai;
 
   while (ai_it != NULL) {
-    dump_sockaddr(ai_it->ai_addr);
+    //dump_sockaddr(ai_it->ai_addr);
     serverfd = socket(ai_it->ai_family, ai_it->ai_socktype, ai_it->ai_protocol);
     if (serverfd != -1) {
       if (connect(serverfd, ai_it->ai_addr, ai_it->ai_addrlen) == 0) break;
