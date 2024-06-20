@@ -367,7 +367,7 @@ void* serve_client(void *newsock)
   char *token;
   char *rest = buffer;
   char *end = rest + strlen(rest) - 1;
-  while (end > rest && isspace((unsinged char)*end)) {
+  while (end > rest && isspace((unsigned char)*end)) {
     *end = '\0';
     end--;
   }
