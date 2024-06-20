@@ -235,6 +235,9 @@ void make_burger(Node *order)
     int str_len = strlen(burger_names[type]);
     *(order->order_str) = (char *)malloc(sizeof(char) * str_len);
     strncpy(*(order->order_str), burger_names[type], str_len);
+
+
+    printf("customer %d order string: %s\n", order->customerID, *(order->order_str));
   }
 
   sleep(1);
@@ -404,8 +407,6 @@ void* serve_client(void *newsock)
     types[burger_count] = type;
   }
 
-  pthread_mutex_unlock(&server_ctx.lock);
-
   // Issue orders to kitchen and wait
   // - Tip: use pthread_cond_wait() to wait
   // - Tip2: use issue_orders() to issue request
@@ -417,6 +418,7 @@ void* serve_client(void *newsock)
   // All orders share the same `remain_count`, so access it through the first orders  
 
   order_list = issue_orders(customerID, types, burger_count);
+  pthread_mutex_unlock(&server_ctx.lock);
   first_order = order_list[0];
 
   while (*(first_order->remain_count) > 0) {
