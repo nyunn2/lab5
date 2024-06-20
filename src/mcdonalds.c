@@ -419,7 +419,9 @@ void* serve_client(void *newsock)
   // If request is successfully handled, hand ordered burgers and say goodbye
   // All orders share the same `remain_count`, so access it through the first orders  
 
+  pthread_mutex_lock(&server_ctx.lock);
   order_list = issue_orders(customerID, types, burger_count);
+  pthread_mutex_unlock(&server_ctx.lock);
   
   first_order = order_list[0];
 
