@@ -69,6 +69,7 @@ typedef struct __node {
   //
   // TODO: Add more variables if needed
   //
+  bool *finished;
 } Node;
 
 /// @brief order data
@@ -128,6 +129,8 @@ Node** issue_orders(unsigned int customerID, enum burger_type *types, unsigned i
   //
   // TODO: Initialize shared Node variables if added any
   //
+  bool *finish = (bool*)malloc(sizeof(bool));
+  *finish = false;
 
   for (int i=0; i<burger_count; i++){
     // Create new Node
@@ -145,6 +148,7 @@ Node** issue_orders(unsigned int customerID, enum burger_type *types, unsigned i
     //
     // TODO: Initialize other Node variables if added any
     //
+    new_node->finished = finish;
 
     // Add Node to list
     pthread_mutex_lock(&server_ctx.lock);
@@ -261,8 +265,6 @@ void* kitchen_task(void *dummy)
     customerID = order->customerID;
     printf("[Thread %lu] generating %s burger for customer %u\n", tid, burger_names[type], customerID);
 
-    fprintf(stderr, "kitchen good\n");
-
     // Make burger and reduce `remain_count` of request
     // - Use make_burger()
     // - Reduce `remain_count` by one
@@ -276,8 +278,9 @@ void* kitchen_task(void *dummy)
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
     // If every burger is made, fire signal to serving thread
-    if(*(order->remain_count) == 0){
+    if(*(order->remain_count) == 0 && !*(order->finished)){
       printf("[Thread %lu] all orders done for customer %u\n", tid, customerID);
+      *(order->finished) = true;
       pthread_cond_signal(order->cond);
     }
 
@@ -323,8 +326,6 @@ void* serve_client(void *newsock)
   clientfd = *(int *) newsock;
   buffer = (char *) malloc(BUF_SIZE);
   msglen = BUF_SIZE;
-
-  fprintf(stderr, "client3\n");
 
   // Get customer ID
   pthread_mutex_lock(&server_ctx.lock);
