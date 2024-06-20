@@ -358,8 +358,6 @@ void* serve_client(void *newsock)
       return NULL;
   }
 
-  printf("%s\n", buffer);
-
   // Parse and split request from the customer into orders
   // - Fill in `types` variable with each parsed burger type and increase `burger_count`
   // - While parsing, if burger is not an available type, exit connection
@@ -381,7 +379,6 @@ void* serve_client(void *newsock)
     if (burger_count >= MAX_BURGERS) break;
     enum burger_type type = BURGER_TYPE_MAX;
 
-    printf("%s\n", token);
     if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
     else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
     else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
@@ -409,14 +406,11 @@ void* serve_client(void *newsock)
   //pthread_mutex_lock(&server_ctx.lock);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
-  fprintf(stderr, "issue good\n");
   //pthread_mutex_unlock(&server_ctx.lock);
 
   while (*(first_order->remain_count) > 0) {
     pthread_cond_wait(first_order->cond, first_order->cond_mutex);
   }
-
-  fprintf(stderr, "wait good\n");
 
   if (*(first_order->remain_count) == 0) {
     ret = asprintf(&message, "Your order(%s) is ready! Goodbye!\n", *(first_order->order_str));
