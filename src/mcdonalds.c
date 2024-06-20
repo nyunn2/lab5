@@ -401,8 +401,8 @@ void* serve_client(void *newsock)
         return NULL;
     }
 
-    burger_count += 1;
     types[burger_count] = type;
+    burger_count += 1;
   }
 
   //pthread_mutex_unlock(&server_ctx.lock);
