@@ -271,14 +271,14 @@ void* kitchen_task(void *dummy)
     // TODO
 
     pthread_mutex_lock(order->cond_mutex);
-    printf("before: customer %d remain count is %d\n", customerID, *(order->remain_count));
+    //printf("before: customer %d remain count is %d\n", customerID, *(order->remain_count));
     make_burger(order);
     *(order->remain_count) -= 1;
     //pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
-    printf("after: customer %d remain count is %d\n", customerID, *(order->remain_count));
+    //printf("after: customer %d remain count is %d\n", customerID, *(order->remain_count));
 
     // If every burger is made, fire signal to serving thread
     if(*(order->remain_count) == 0 && !*(order->finished)){
@@ -411,7 +411,7 @@ void* serve_client(void *newsock)
   // All orders share the same `remain_count`, so access it through the first orders  
 
   //pthread_mutex_lock(&server_ctx.lock);
-  printf("customer %d burgercount: %d\n", customerID, burger_count);
+  //printf("customer %d burgercount: %d\n", customerID, burger_count);
   order_list = issue_orders(customerID, types, burger_count);
   first_order = order_list[0];
   //pthread_mutex_unlock(&server_ctx.lock);
