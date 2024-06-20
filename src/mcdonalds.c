@@ -271,15 +271,14 @@ void* kitchen_task(void *dummy)
     // TODO
 
     pthread_mutex_lock(order->cond_mutex);
-    printf("customer %d remain count is %d\n", customerID, *(order->remain_count));
+    printf("before: customer %d remain count is %d\n", customerID, *(order->remain_count));
     make_burger(order);
-    //pthread_mutex_lock(order->cond_mutex);
-    *(order->remain_count)--;
-    pthread_mutex_unlock(order->cond_mutex);
+    *(order->remain_count) -= 1;
+    //pthread_mutex_unlock(order->cond_mutex);
 
     printf("[Thread %lu] %s burger for customer %u is ready\n", tid, burger_names[type], customerID);
 
-    //printf("customer %d remain count is %d\n", customerID, *(order->remain_count));
+    printf("after: customer %d remain count is %d\n", customerID, *(order->remain_count));
 
     // If every burger is made, fire signal to serving thread
     if(*(order->remain_count) == 0 && !*(order->finished)){
@@ -287,6 +286,8 @@ void* kitchen_task(void *dummy)
       *(order->finished) = true;
       pthread_cond_signal(order->cond);
     }
+
+    pthread_mutex_unlock(order->cond_mutex);
 
     // Increase burger count
     pthread_mutex_lock(&server_ctx.lock);
