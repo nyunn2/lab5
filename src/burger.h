@@ -47,7 +47,7 @@
 
 #define CUSTOMER_MAX 10                                   ///< maximum number of clients
 #define NUM_KITCHEN 30                                    ///< number of kitchen thread(s)
-#define MAX_BURGERS 3                                     ///< max number of burgers per order
+#define MAX_BURGERS 10                                   ///< max number of burgers per order
 #define BURGER_NUM_RAND 0                                 ///< randomly select the number of burgers
 
 /// @}
