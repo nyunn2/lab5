@@ -4,8 +4,8 @@
 /// @file
 /// @brief Simple virtual McDonald's server for Network Lab
 ///
-/// @author Jungyun Oh
-/// @studid 2022-19510
+/// @author <your name>
+/// @studid <your student id>
 ///
 /// @section changelog Change Log
 /// 2020/11/18 Hyunik Kim created
@@ -485,7 +485,7 @@ void start_server()
     if (clientfd > 0) {
       if (server_ctx.total_queueing >= CUSTOMER_MAX) {
         close(clientfd);
-        //printf("Maximum number of customers reached. Connection refused.\n");
+        printf("Maximum number of customers reached. Connection refused.\n");
         continue;
       }
 
