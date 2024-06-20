@@ -389,7 +389,7 @@ void* serve_client(void *newsock)
 
     if (strcmp(token, "bigmac") == 0) {type = BURGER_BIGMAC; printf("big\n");}
     else if (strcmp(token, "cheese") == 0) {type = BURGER_CHEESE; printf("cheese\n");}
-    else if (strcmp(token, "chicken") == 0) {type = BURGER_CHICKEN; priintf("chicken\n");}
+    else if (strcmp(token, "chicken") == 0) {type = BURGER_CHICKEN; printf("chicken\n");}
     else if (strcmp(token, "bulgogi") == 0) {type = BURGER_BULGOGI; printf("bulgogi\n");}
 
     if (type == BURGER_TYPE_MAX) {
