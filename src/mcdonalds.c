@@ -387,10 +387,10 @@ void* serve_client(void *newsock)
     if (burger_count >= MAX_BURGERS) break;
     enum burger_type type = BURGER_TYPE_MAX;
 
-    if (strcmp(token, "bigmac") == 0) type = BURGER_BIGMAC;
-    else if (strcmp(token, "cheese") == 0) type = BURGER_CHEESE;
-    else if (strcmp(token, "chicken") == 0) type = BURGER_CHICKEN;
-    else if (strcmp(token, "bulgogi") == 0) type = BURGER_BULGOGI;
+    if (strcmp(token, "bigmac") == 0) {type = BURGER_BIGMAC; printf("big\n");}
+    else if (strcmp(token, "cheese") == 0) {type = BURGER_CHEESE; printf("cheese\n");}
+    else if (strcmp(token, "chicken") == 0) {type = BURGER_CHICKEN; priintf("chicken\n");}
+    else if (strcmp(token, "bulgogi") == 0) {type = BURGER_BULGOGI; printf("bulgogi\n");}
 
     if (type == BURGER_TYPE_MAX) {
         printf("Error: unknown burger type\n");
